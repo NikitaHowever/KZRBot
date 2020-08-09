@@ -23,7 +23,7 @@ class Item:
 
     @property
     def get_material(self):
-        return self.get_material
+        return self.material
     
     @property
     def get_descriptiom(self):

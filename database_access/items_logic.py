@@ -1,7 +1,7 @@
 import pandas as pd
 
-from base import DataBase
-from entities import Item
+from .base import DataBase
+from .entities import Item
 
 
 

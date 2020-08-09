@@ -1,0 +1,1 @@
+CART, DELIVERY_TYPE = range(2)
