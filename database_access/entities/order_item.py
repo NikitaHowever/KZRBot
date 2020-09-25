@@ -1,29 +1,18 @@
-
-class OrderItem:
-    def __init__(self, id, customer_name, customer_lastname, order_type_id, paper_size_id):
-        self.id = id
-        self.customer_name = customer_name
-        self.customer_lastname = customer_lastname
-        self.order_type_id = order_type_id
-        self.paper_size_id = paper_size_id
+class Order:
+    def __init__(self, order_id, item_id, amount):
+        self.order_id = order_id
+        self.item_id = item_id
+        self.amount = amount
 
     
     @property
-    def get_id(self):
-        return self.id
-
-    @property
-    def get_customer_name(self):
-        return self.customer_name
-
-    @property
-    def get_customer_lastname(self):
-        return self.customer_lastname
+    def get_order_id(self):
+        return self.order_id
     
     @property
-    def get_order_type_id(self):
-        return self.order_type_id
+    def get_item_id(self):
+        return self.item_id
     
     @property
-    def get_paper_size_id(self):
-        return self.paper_size_id
+    def get_item_amount(self):
+        return self.amount

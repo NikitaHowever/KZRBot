@@ -1,5 +1,18 @@
 class Global:
-    price_counter = 0
-    element_names = []
-    element_counters = {}
-    element_buttons = {}
+    def __init__(self):
+        self.price_counter = 0
+        self.cart_message_id = 0
+        self.cities_counter = 0
+
+        self.element_names = []
+        self.element_counters = {}
+        self.element_buttons = {}
+        self.picks = [],
+        self.credentials = {}
+        self.order_type = ""
+        self.pick_code = ""
+        
+
+
+
+
