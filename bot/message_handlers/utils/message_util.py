@@ -34,7 +34,7 @@ def send_items(update, context):
         message = '{}\nМатериал: {}\n{}\nЗа упаковку: {}руб'.format(item.get_name, item.get_material, item.get_descriptiom, item.get_price_for_pack)
         
         buttons = [[]]
-        images = ['https://live.staticflickr.com/65535/50216780317_c3140a5660_b.jpg', 'https://live.staticflickr.com/65535/50216780277_df00a96242_b.jpg', 'https://live.staticflickr.com/65535/50215899538_2c700d4c14_b.jpg']
+        #images = ['https://live.staticflickr.com/65535/50216780317_c3140a5660_b.jpg', 'https://live.staticflickr.com/65535/50216780277_df00a96242_b.jpg', 'https://live.staticflickr.com/65535/50215899538_2c700d4c14_b.jpg']
 
         if(global_state.get(user_id) == None):
             global_state[user_id] = Global()
@@ -58,7 +58,7 @@ def send_items(update, context):
 
         markup = InlineKeyboardMarkup(buttons)
 
-        context.bot.send_photo(chat_id=update.effective_chat.id,photo=images[item.get_id - 1],caption=message, reply_markup=markup)
+        context.bot.send_photo(chat_id=update.effective_chat.id,photo=item.get_item_image,caption=message, reply_markup=markup)
 
 def send_delivery_types(update, context):
     user_id = update.message.chat.id

@@ -1,7 +1,7 @@
 
 class Item:
     def __init__(self, id, name, material, description, has_one_size,
-                    paper_size_id, price_for_pack, price_for_displaybox):
+                    paper_size_id, price_for_pack, price_for_displaybox, item_image):
 
                     self.id = id
                     self.name = name
@@ -11,6 +11,7 @@ class Item:
                     self.paper_size_id = has_one_size if paper_size_id else None
                     self.price_for_pack = price_for_pack
                     self.price_for_displaybox = price_for_displaybox
+                    self.item_image = item_image
     
 
     @property
@@ -44,3 +45,7 @@ class Item:
     @property
     def get_price_for_displaybox(self):
         return self.price_for_displaybox
+    
+    @property
+    def get_item_image(self):
+        return self.item_image

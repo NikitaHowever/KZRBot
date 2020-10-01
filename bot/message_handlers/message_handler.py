@@ -15,56 +15,6 @@ def message_handler(update, context):
 
     return CART
 
-def name_handler(update, context):
-    user_id = update.effective_chat.id
-
-    global_state[user_id].credentials["name"] = update.message.text
-
-    context.bot.send_message(chat_id=user_id,text='Введите вашу фамилию')
-
-    return CREDENTIALS_SN
-
-def secondname_handler(update, context):
-    user_id = update.effective_chat.id
-
-    global_state[user_id].credentials["secondname"] = update.message.text
-
-    context.bot.send_message(chat_id=user_id,text='Введите email')
-    return CREDENTIALS_EMAIL
-
-def email_handler(update, context):
-    user_id = update.effective_chat.id
-
-    global_state[user_id].credentials["email"] = update.message.text
-
-    context.bot.send_message(chat_id=user_id, text='Введите телефон')
-    return CREDENTIALS_PHONE
-
-
-def phone_handler(update, context):
-    user_id = update.effective_chat.id
-
-    global_state[user_id].credentials["phone"] = update.message.text
-
-    if(global_state[user_id].order_type == 'boxberry'):
-        form_check_creds_data(user_id, context)
-        return CREDENTIALS_CHECK
-    
-    context.bot.send_message(chat_id=user_id, text='Введите почтовый индекс')
-    return CREDENTIALS_POSTINDEX
-
-
-def postindex_handler(update, context):
-    user_id = update.effective_chat.id
-
-    global_state[user_id].credentials['post_index'] = update.message.text
-
-    form_check_creds_data(user_id, context)
-
-
-    return CREDENTIALS_CHECK
-
-
 
 
 def form_check_creds_data(user_id, context):

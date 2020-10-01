@@ -22,14 +22,6 @@ boxberry_region_callback_handler = CallbackQueryHandler(boxberry_region_handler,
 boxberry_back_callback_handler = CallbackQueryHandler(boxberry_back_handler, pattern="city_code_back")
 boxberry_city_callback_handler = CallbackQueryHandler(boxbery_city_handler, pattern="city_code=")
 boxberry_pick_callback_handler = CallbackQueryHandler(pick_handler, pattern="pick_code=")
-creds_name_handler = MessageHandler(Filters.text, name_handler)
-creds_secondname_handler = MessageHandler(Filters.text, secondname_handler)
-creds_phone_handler = MessageHandler(Filters.text, phone_handler)
-creds_postindex_handler = MessageHandler(Filters.text, postindex_handler)
-creds_email_handler = MessageHandler(Filters.text, email_handler)
-change_creds_callback_handler = CallbackQueryHandler(change_creds_handler, pattern='creds_data=change')
-cancel_creds_callback_handler = CallbackQueryHandler(cancel_creds_handler, pattern='creds_data=cancel')
-accept_creds_callback_handlel = CallbackQueryHandler(accept_creds_handler, pattern='creds_data=accept')
 admin_creds_callback_handler = MessageHandler(Filters.text,admin_password_handler)
 admin_creds_cancel_handler = CallbackQueryHandler(cancel_admin, pattern='admin_cancel')
 
@@ -41,12 +33,6 @@ conv_handler = ConversationHandler(
         CART: [admin_handler,inc_callback_handler, dec_callback_handler, message_handler, ord_handler],
         DELIVERY_TYPE: [admin_handler,pickup_callback_handler,cancel_ord_handler, boxberry_callback_handler,boxberry_pick_callback_handler,boxberry_city_callback_handler],
         BOXBERRY: [admin_handler,boxberry_region_callback_handler, boxberry_back_callback_handler,boxberry_city_callback_handler ],
-        CREDENTIALS_N: [creds_name_handler],
-        CREDENTIALS_SN: [creds_secondname_handler],
-        CREDENTIALS_PHONE: [creds_phone_handler],
-        CREDENTIALS_POSTINDEX: [creds_postindex_handler],
-        CREDENTIALS_EMAIL: [creds_email_handler],
-        CREDENTIALS_CHECK: [change_creds_callback_handler, cancel_creds_callback_handler,accept_creds_callback_handlel],
         ADMIN_CREDS: [admin_creds_callback_handler, admin_creds_cancel_handler]
         
     },
