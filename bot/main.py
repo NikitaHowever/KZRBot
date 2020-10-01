@@ -1,9 +1,9 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler,ConversationHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler,ConversationHandler,PreCheckoutQueryHandler, Filters
 
 from .command_handlers import start,become_admin
-from .message_handlers.message_handler import cancel_admin,admin_password_handler , message_handler,email_handler, order_handler, name_handler, secondname_handler, phone_handler, order_handler, postindex_handler
-from .message_handlers.callback_handler import increment_cart_handler, decrement_cart_handler, picckup_handler, cancel_order_handler, boxberry_handler, boxberry_region_handler, boxberry_back_handler, accept_creds_handler, change_creds_handler, cancel_creds_handler, boxbery_city_handler, pick_handler
-from bot.helpers import ADMIN_CREDS, CART, DELIVERY_TYPE, BOXBERRY,CREDENTIALS_N,CREDENTIALS_EMAIL,CREDENTIALS_SN,CREDENTIALS_PHONE,CREDENTIALS_CHECK,CREDENTIALS_POSTINDEX, global_state
+from .message_handlers.message_handler import cancel_admin,admin_password_handler, message_handler, order_handler
+from .message_handlers.callback_handler import increment_cart_handler,precheckout_handler,successful_payment_callback, decrement_cart_handler, picckup_handler, cancel_order_handler, boxberry_handler, boxberry_region_handler, boxberry_back_handler, boxbery_city_handler, pick_handler
+from bot.helpers import ADMIN_CREDS,PAYMENT_PICKUP, CART, DELIVERY_TYPE, BOXBERRY, global_state
 
 
 
@@ -24,16 +24,19 @@ boxberry_city_callback_handler = CallbackQueryHandler(boxbery_city_handler, patt
 boxberry_pick_callback_handler = CallbackQueryHandler(pick_handler, pattern="pick_code=")
 admin_creds_callback_handler = MessageHandler(Filters.text,admin_password_handler)
 admin_creds_cancel_handler = CallbackQueryHandler(cancel_admin, pattern='admin_cancel')
+precheckout_query_pickup_handler = PreCheckoutQueryHandler(precheckout_handler)
+success_payment_handler = MessageHandler(Filters.successful_payment, successful_payment_callback)
 
 
 
 conv_handler = ConversationHandler(
     entry_points=[start_handler],
     states={
-        CART: [admin_handler,inc_callback_handler, dec_callback_handler, message_handler, ord_handler],
+        CART: [admin_handler,inc_callback_handler,success_payment_handler, dec_callback_handler, message_handler, ord_handler],
         DELIVERY_TYPE: [admin_handler,pickup_callback_handler,cancel_ord_handler, boxberry_callback_handler,boxberry_pick_callback_handler,boxberry_city_callback_handler],
         BOXBERRY: [admin_handler,boxberry_region_callback_handler, boxberry_back_callback_handler,boxberry_city_callback_handler ],
-        ADMIN_CREDS: [admin_creds_callback_handler, admin_creds_cancel_handler]
+        ADMIN_CREDS: [admin_creds_callback_handler, admin_creds_cancel_handler],
+        PAYMENT_PICKUP: [precheckout_query_pickup_handler]
         
     },
     fallbacks=[start_handler],
@@ -48,6 +51,8 @@ dispatcher = updater.dispatcher
 #dispatcher.add_handler(message_handler)
 dispatcher.add_handler(conv_handler)
 dispatcher.add_handler(admin_handler)
+dispatcher.add_handler(precheckout_query_pickup_handler)
+dispatcher.add_handler(success_payment_handler)
 
 
 def start_bot():

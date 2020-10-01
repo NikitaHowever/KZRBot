@@ -1,13 +1,16 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from telegram.error import BadRequest
+from telegram import Invoice
+from telegram import LabeledPrice
 import json
 import uuid
+import re
 
-from bot.helpers import CART, global_state, DELIVERY_TYPE, BOXBERRY, CREDENTIALS_N, admin_list
+from bot.helpers import CART, global_state, DELIVERY_TYPE,PAYMENT_PICKUP,PAYMENT_BOXBERRY, BOXBERRY, admin_list
 from bot.command_handlers import  start
 from .message_handler import message_handler
 from database_access import create_order
-from .utils import get_new_cart_markup, update_and_get_markup, update_message, get_payment_url, get_points, get_cities_list, create_parsel, get_regions
+from .utils import get_new_cart_markup, update_and_get_markup, update_message, get_payment_url, get_points, get_cities_list, create_parsel, get_regions, Item
 
 def increment_cart_handler(update, context):
     query = update.callback_query
@@ -55,10 +58,15 @@ def decrement_cart_handler(update, context):
         return CART
 
 def picckup_handler(update, context):
-    global_state[update.effective_chat.id].order_type = "pickup"
+    user_id = update.effective_chat.id
+    global_state[user_id].order_type = "pickup"
     
-    context.bot.send_message(chat_id=update.effective_chat.id, text='Введите ваше имя')
-    return CREDENTIALS_N
+    #invoice = Invoice("Оплата заказа", "Заказ", "kzr-paper", "rub", global_state[user_id].price_counter)
+    token = '381764678:TEST:19579'
+    prices = [LabeledPrice("Сумма заказа", global_state[user_id].price_counter * 100)]
+
+    context.bot.sendInvoice(user_id, 'Оплата заказа', 'Заказ', 'pickup', token, 'kzr-paper-start-param', 'RUB', prices, need_name=True, need_phone_number=True, need_email=True)
+    return DELIVERY_TYPE
 
 def boxberry_handler(update, context):
     buttons = []
@@ -200,12 +208,15 @@ def boxbery_city_handler(update, context):
 def pick_handler(update, context):
     username = update.effective_user.username
     user_id = update.callback_query.message.chat.id
+    token = '381764678:TEST:19579'
+    prices = [LabeledPrice("Сумма заказа", global_state[user_id].price_counter * 100)]
+
     global_state[user_id].pick_code = update.callback_query.data
     print("pick")
     print(username)
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text='Введите ваше имя')
-    return CREDENTIALS_N
+    context.bot.send_invoice(user_id, 'Оплата заказа', 'Заказ', 'boxberry', token, 'kzr-paper-start-param', 'RUB', prices, need_name=True, need_phone_number=True, need_email=True)
+    return PAYMENT_PICKUP
 
     
     
@@ -219,37 +230,60 @@ def cancel_order_handler(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text='Заказ отменен!',reply_markup=markup)
     return CART
 
-def change_creds_handler(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text='Введите ваше имя')
-    return CREDENTIALS_N
-
-def cancel_creds_handler(update, context):
-    if(global_state[update.effective_chat.id].order_type == 'boxberry'):
-        boxberry_handler(update, context)
-    else:
-        message_handler(update, context)
-
-def accept_creds_handler(update, context):
-    unique_id = uuid.uuid4()
-    user_id = update.effective_chat.id
-
-    name = global_state[user_id].credentials['name']
-    second_name = global_state[user_id].credentials['secondname']
-    phone = global_state[user_id].credentials['phone']
-    email = global_state[user_id].credentials['email']
-
+def precheckout_handler(update, context):
     
+    query = update.pre_checkout_query
+    email = query.order_info.email
+    regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
-    if(global_state[user_id].order_type == 'boxberry'):
-        create_order(user_id,name, second_name, phone, email, 2, 1,unique_id,boxberry_track_number='dsad')
+    if(re.search(regex, email)):
+        query.answer(ok=True)
     else:
-        create_order(user_id, name, second_name, phone, email, 1, 1,unique_id,customer_post_index='dsada')
-    context.bot.send_message(chat_id=user_id, text="Номер вашего заказа: {}".format(unique_id))
+        query.answer(ok=False, error_message='Вы вели невалидный email!')
+
+    return DELIVERY_TYPE
+
+def successful_payment_callback(update, context):
+    print("success")
+    print(update)
+    query = update.message.successful_payment
+    user_id = update.message.chat.id
+    username_arr = query.order_info.name.split(' ')
+    user_name = ""
+    user_secondname = ""
+    user_phone =  query.order_info.phone_number
+    user_email =  query.order_info.email
+
+    if(len(username_arr) == 1):
+        user_name = username_arr[0]
+    else:
+        user_name = username_arr[0]
+        user_secondname = username_arr[1]
+
+    print(query)
+    unique_order_id = uuid.uuid4()
+    if(query.invoice_payload == 'pickup'):
+        create_order(user_id, user_name, user_secondname, user_phone, user_email, 1, 5, unique_order_id)
+        context.bot.send_message(chat_id=user_id, text="Мы свяжемся с вами как только ваш заказ будет готов!")
+    else:
+        items = get_items(user_id)
+        pick_code_arr = global_state[user_id].pick_code.split('=')
+        track_number = create_parsel(unique_order_id, global_state[user_id].price_counter, pick_code_arr[1], user_name, user_phone, user_email, items)
+        create_order(user_id, user_name, user_secondname, user_phone, user_email, 1, 5, unique_order_id, track_number)
+        context.bot.send_message(chat_id=user_id, text="Ваш номер для отслеживания заказа {}".format(track_number))
     
-    username = update.effective_user.username
-    notify_all_admins(context, username, unique_id)
-    global_state[user_id].price_counter = 0
-    return start(update, context)
+    return CART
+
+def get_items(user_id):
+    items = []
+
+    for item in global_state[user_id].element_counters:
+        if(global_state[user_id].element_counters[item][1] == 0):
+            continue
+        items.append(Item(item, global_state[user_id].element_counters[item][0], "ШТ", 10, global_state[user_id].element_counters[item][2], global_state[user_id].element_counters[item][1]))
+    
+    return items
+
 
 def notify_all_admins(context, username, order_id):
     if admin_list.count == 0:

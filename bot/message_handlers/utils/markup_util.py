@@ -13,7 +13,7 @@ def get_new_cart_markup(user_id):
 
 def update_and_get_markup(item_id,user_id,price,inc_or_dec=False):
     keyboard = global_state[user_id].element_buttons[item_id]
-    counter = global_state[user_id].element_counters[item_id]
+    counter = global_state[user_id].element_counters[item_id][1]
 
     if(inc_or_dec):
         counter += 1
@@ -25,7 +25,7 @@ def update_and_get_markup(item_id,user_id,price,inc_or_dec=False):
             global_state[user_id].price_counter -= price
 
     keyboard[0][1].text = str(counter)
-    global_state[user_id].element_counters[item_id] = counter
+    global_state[user_id].element_counters[item_id][1] = counter
     global_state[user_id].element_buttons[item_id] = keyboard
 
     reply_markup = InlineKeyboardMarkup(keyboard)

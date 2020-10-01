@@ -40,7 +40,8 @@ def send_items(update, context):
             global_state[user_id] = Global()
 
         #if(global_state[user_id].element_counters.get(item.get_id) == None):
-        global_state[user_id].element_counters[item.get_id] = 0
+        global_state[user_id].element_counters[item.get_id] = [item.get_name, 0, item.get_price_for_pack]
+        
         #if(global_state[user_id].element_buttons.get(item.get_id) == None):
         json_callback_data_inc = {"action":"inc","itemId":item.get_id, "price":item.get_price_for_pack}
         json_callback_data_dec = {"action":"dec", "itemId":item.get_id, "price":item.get_price_for_pack}
@@ -50,7 +51,7 @@ def send_items(update, context):
             
 
         buttons[0].append(InlineKeyboardButton('+', callback_data=json_callback_data_inc_str))
-        buttons[0].append(InlineKeyboardButton('{}'.format(global_state[user_id].element_counters[item.get_id]), callback_data="dummy"))
+        buttons[0].append(InlineKeyboardButton('{}'.format(global_state[user_id].element_counters[item.get_id][1]), callback_data="dummy"))
         buttons[0].append(InlineKeyboardButton('-', callback_data=json_callback_data_dec_str))
         global_state[user_id].element_buttons[item.get_id] = buttons
         #else:

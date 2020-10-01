@@ -14,7 +14,7 @@ def get_items():
     cursor.execute('SELECT * FROM KZRBotDb.dbo.Item')
 
     for row in cursor:
-        item = Item(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+        item = Item(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8])
         items_list.append(item)
     
     return items_list
