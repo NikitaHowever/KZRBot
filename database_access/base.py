@@ -2,7 +2,7 @@ import pyodbc
 
 class DataBase:
     def __init__(self):
-        self.conn_string = "Driver={ODBC Driver 17 for SQL Server};SERVER=217.107.219.93;DATABASE=KZRBotDb;UID=SA;PWD=Wsr12345678;"
+        self.conn_string = "Driver={ODBC Driver 17 for SQL Server};SERVER=217.107.219.93;DATABASE=KZRBotDb;UID=SA;PWD=Wsr12345678;unicode_results=True;CHARSET=UTF8"
         self.conn = None
 
         self._init_connection()

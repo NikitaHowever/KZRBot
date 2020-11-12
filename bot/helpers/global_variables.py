@@ -6,6 +6,7 @@ class Global:
 
         self.element_names = []
         self.element_counters = {}
+        self.admin_element_counters={}
         self.element_buttons = {}
         self.picks = [],
         self.credentials = {}

@@ -34,13 +34,13 @@ def send_items(update, context):
         message = '{}\nМатериал: {}\n{}\nЗа упаковку: {}руб'.format(item.get_name, item.get_material, item.get_descriptiom, item.get_price_for_pack)
         
         buttons = [[]]
-        #images = ['https://live.staticflickr.com/65535/50216780317_c3140a5660_b.jpg', 'https://live.staticflickr.com/65535/50216780277_df00a96242_b.jpg', 'https://live.staticflickr.com/65535/50215899538_2c700d4c14_b.jpg']
 
         if(global_state.get(user_id) == None):
             global_state[user_id] = Global()
 
         #if(global_state[user_id].element_counters.get(item.get_id) == None):
         global_state[user_id].element_counters[item.get_id] = [item.get_name, 0, item.get_price_for_pack]
+        global_state[user_id].price_counter = 0
         
         #if(global_state[user_id].element_buttons.get(item.get_id) == None):
         json_callback_data_inc = {"action":"inc","itemId":item.get_id, "price":item.get_price_for_pack}
@@ -69,7 +69,6 @@ def send_delivery_types(update, context):
         return False
     buttons = [[]]
     buttons[0].append(InlineKeyboardButton('Самовывоз', callback_data="pickup"))
-    buttons[0].append(InlineKeyboardButton('Boxberry', callback_data='boxberry'))
 
     markup = InlineKeyboardMarkup(buttons)
     context.bot.send_message(chat_id=update.effective_chat.id,text='Выберете способ доставки!', reply_markup=markup)
